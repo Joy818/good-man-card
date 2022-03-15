@@ -1,0 +1,36 @@
+# Windows image file caches
+Thumbs.db
+ehthumbs.db
+
+# Folder config file
+Desktop.ini
+
+*.DS_Store
+
+# java class file
+*.class
+
+# Package Files #
+*.war
+*.ear
+/good-man-card-web/target
+/good-man-card-web/.settings
+/good-man-card-web/.classpath
+/good-man-card-web/.project
+/good-man-card-web/.idea
+
+# ignore Maven generated target folders
+target
+out
+
+# ignore eclipse files
+.project
+.classpath
+.settings
+.factorypath
+.metadata
+.idea
+*.iml
+
+# ignore log files
+*.log

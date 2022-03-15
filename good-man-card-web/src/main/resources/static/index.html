@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <title>Good man card</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+    <!-- 引入样式 -->
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+    <!-- 引入组件库 -->
+    <script src="https://unpkg.com/element-ui/lib/index.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+</head>
+<body>
+<div id="app">
+
+    <el-row type="flex" justify="center">
+        <el-col :md="14">
+            <div style="margin-bottom: 20px;margin-top: 10px">
+                <span style="color: #409EFF;">已完成：{{statistic.total}}</span>
+                <span style="color: #67C23A;margin-left: 20px;">成功：{{statistic.success}}</span>
+                <span style="float: right;color: #909399;">Create by mkit.</span>
+            </div>
+            <el-tabs v-model="activeName" @tab-click="handleClick">
+                <el-tab-pane label="查询任务" name="query">
+                    <el-form :inline="true" :model="taskQuery" class="demo-form-inline">
+                        <el-form-item label="任务ID">
+                            <el-input v-model="taskQuery.rid" placeholder="任务ID"></el-input>
+                        </el-form-item>
+                        <el-form-item>
+                            <el-button type="primary" @click="getTaskInfo">查询</el-button>
+                        </el-form-item>
+                    </el-form>
+                    <div v-show="taskInfo.rid != null && taskInfo.rid !== ''">
+                        <p>任务ID: {{taskInfo.rid}}</p>
+                        <p>任务状态: {{taskStateFormatter(taskInfo.state)}}</p>
+                        <p>更新时间: {{taskInfo.updateTime}}</p>
+                        <p v-show="taskInfo.rank">等待任务数：{{taskInfo.rank}}</p>
+                        <p v-show="taskInfo.remarks">等待任务数：{{taskInfo.remarks}}</p>
+                    </div>
+                </el-tab-pane>
+                <el-tab-pane label="创建任务" name="add">
+                    <el-form ref="form" :model="params" label-width="80px">
+                        <el-form-item label="账号">
+                            <el-input v-model="params.account"></el-input>
+                        </el-form-item>
+                        <el-form-item label="密码">
+                            <el-input v-model="params.password" type="password"></el-input>
+                        </el-form-item>
+                        <el-form-item label="学校">
+                            <el-input v-model="params.school"></el-input>
+                        </el-form-item>
+                        <el-form-item>
+                            <el-button type="primary" @click="submitTask">提交</el-button>
+                        </el-form-item>
+                    </el-form>
+                </el-tab-pane>
+            </el-tabs>
+        </el-col>
+    </el-row>
+</div>
+<script>
+  const app = new Vue({
+    el: '#app',
+    data() {
+      return {
+        type:'sdsafe',
+        params: {
+          account: null,
+          password: null,
+          school: null
+        },
+        taskQuery: {
+          rid: '',
+        },
+        taskInfo: {
+          rid: '',
+          state: '',
+          updateTime: '',
+          rank: ''
+        },
+        statistic: {
+          total: '',
+          successCount: ''
+        },
+        activeName: 'query'
+      }
+    },
+    created() {
+      this.getStatisticInfo();
+    },
+    methods: {
+      taskStateFormatter(value) {
+        return ({
+          0: '排队中',
+          1: '正在执行',
+          2: '执行成功',
+          3: '执行失败'
+        })[value]
+      },
+      handleClick(tab, event) {
+        console.log(tab, event);
+      },
+      getStatisticInfo() {
+        axios.get(`/task/statistic?type=${this.type}`)
+        .then(({data})=>{
+          if (data.code !== 0) {
+            return
+          }
+          this.statistic = data.data;
+        })
+      },
+      getTaskInfo() {
+        axios.get(`/task/get?rid=${this.taskQuery.rid}`)
+          .then(({data}) => {
+            if (data.code !== 0) {
+              this.$message.error(data.message)
+              this.taskInfo = {};
+              return
+            }
+            this.taskInfo = data.data;
+          })
+      },
+      submitTask() {
+        axios.post('/task/add', {
+          type: this.type,
+          params: JSON.stringify(this.params)
+        }).then(({data}) => {
+          if (data.code !== 0) {
+            this.$message.error(data.message)
+            return
+          }
+
+          this.$message({
+            message: '提交成功',
+            type: 'success'
+          });
+        })
+      },
+    }
+  })
+</script>
+</body>
+</html>

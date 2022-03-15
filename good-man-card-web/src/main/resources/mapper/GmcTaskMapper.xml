@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="pri.zhy.gmc.web.mapper.IGmcTaskMapper">
+
+    <select id="countByState" resultType="java.lang.Integer">
+        select count(*)
+        from gmc_task
+        where type = #{type}
+          and state = #{state};
+    </select>
+    <select id="selectRankByState" resultType="java.lang.Integer">
+        select count(id)
+        from gmc_task
+        where state = #{state}
+          and id &lt;=
+              (
+                  select id
+                  from gmc_task
+                  where rid = #{rid}
+              )
+    </select>
+
+</mapper>
