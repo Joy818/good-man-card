@@ -16,6 +16,7 @@ public class TaskInfoDTO {
     private String rid;
     private String type;
     private Integer state;
+    private String result;
     private String remarks;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createTime;

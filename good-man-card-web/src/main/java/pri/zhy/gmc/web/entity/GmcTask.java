@@ -22,6 +22,7 @@ public class GmcTask {
     private String type;
     private String params;
     private Integer state;
+    private String result;
     private String remarks;
     private LocalDateTime createTime;
     private LocalDateTime updateTime;

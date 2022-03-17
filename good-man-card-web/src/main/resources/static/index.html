@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <title>Good man card</title>
-    <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+    <script src="/vue.js"></script>
     <!-- 引入样式 -->
-    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+    <link rel="stylesheet" href="/index.css">
     <!-- 引入组件库 -->
-    <script src="https://unpkg.com/element-ui/lib/index.js"></script>
-    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="/index.js"></script>
+    <script src="/axios.min.js"></script>
 </head>
 <body>
 <div id="app">
@@ -22,7 +22,7 @@
             </div>
             <el-tabs v-model="activeName" @tab-click="handleClick">
                 <el-tab-pane label="查询任务" name="query">
-                    <el-form :inline="true" :model="taskQuery" class="demo-form-inline">
+                    <el-form :model="taskQuery" class="demo-form-inline">
                         <el-form-item label="任务ID">
                             <el-input v-model="taskQuery.rid" placeholder="任务ID"></el-input>
                         </el-form-item>
@@ -35,11 +35,20 @@
                         <p>任务状态: {{taskStateFormatter(taskInfo.state)}}</p>
                         <p>更新时间: {{taskInfo.updateTime}}</p>
                         <p v-show="taskInfo.rank">等待任务数：{{taskInfo.rank}}</p>
-                        <p v-show="taskInfo.remarks">等待任务数：{{taskInfo.remarks}}</p>
+                        <p v-show="taskInfo.result">结果：{{taskInfo.result}}</p>
+                        <p v-show="taskInfo.remarks">备注：{{taskInfo.remarks}}</p>
                     </div>
                 </el-tab-pane>
                 <el-tab-pane label="创建任务" name="add">
-                    <el-form ref="form" :model="params" label-width="80px">
+                    <el-result :icon="addResult.success ? 'success': 'error'" :title="addResult.title" v-show="showResult">
+                        <template slot="subTitle">
+                            {{addResult.message}}
+                        </template>
+                        <template slot="extra">
+                            <el-button type="primary" size="medium" @click="onBackClicked">返回</el-button>
+                        </template>
+                    </el-result>
+                    <el-form ref="form" :model="params" label-width="80px" v-show="!showResult">
                         <el-form-item label="账号">
                             <el-input v-model="params.account"></el-input>
                         </el-form-item>
@@ -63,7 +72,7 @@
     el: '#app',
     data() {
       return {
-        type:'sdsafe',
+        type: 'sdsafe',
         params: {
           account: null,
           password: null,
@@ -78,6 +87,13 @@
           updateTime: '',
           rank: ''
         },
+        showResult: false,
+        addResult: {
+          success: false,
+          title: '提交成功',
+          message: '-',
+          rid: '-'
+        },
         statistic: {
           total: '',
           successCount: ''
@@ -89,6 +105,9 @@
       this.getStatisticInfo();
     },
     methods: {
+      onBackClicked() {
+        this.showResult = false;
+      },
       taskStateFormatter(value) {
         return ({
           0: '排队中',
@@ -98,16 +117,16 @@
         })[value]
       },
       handleClick(tab, event) {
-        console.log(tab, event);
+        this.showResult = false
       },
       getStatisticInfo() {
         axios.get(`/task/statistic?type=${this.type}`)
-        .then(({data})=>{
-          if (data.code !== 0) {
-            return
-          }
-          this.statistic = data.data;
-        })
+          .then(({data}) => {
+            if (data.code !== 0) {
+              return
+            }
+            this.statistic = data.data;
+          })
       },
       getTaskInfo() {
         axios.get(`/task/get?rid=${this.taskQuery.rid}`)
@@ -126,14 +145,17 @@
           params: JSON.stringify(this.params)
         }).then(({data}) => {
           if (data.code !== 0) {
-            this.$message.error(data.message)
+            this.addResult.success = false;
+            this.addResult.title = '任务提交失败';
+            this.addResult.message = data.message;
+            this.showResult = true
             return
           }
 
-          this.$message({
-            message: '提交成功',
-            type: 'success'
-          });
+          this.addResult.success = true;
+          this.addResult.title = '任务提交成功';
+          this.addResult.message = `任务ID: ${data.data.rid}  (请保存好任务ID,用于查询任务进度)`;
+          this.showResult = true
         })
       },
     }

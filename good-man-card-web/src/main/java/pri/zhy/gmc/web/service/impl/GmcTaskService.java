@@ -11,12 +11,8 @@ import org.springframework.stereotype.Service;
 import pri.zhy.gmc.web.entity.GmcTask;
 import pri.zhy.gmc.web.enums.TaskStateEnum;
 import pri.zhy.gmc.web.mapper.IGmcTaskMapper;
-import pri.zhy.gmc.web.model.AddTaskRequest;
-import pri.zhy.gmc.web.model.QueueInfoDTO;
-import pri.zhy.gmc.web.model.TaskInfoDTO;
-import pri.zhy.gmc.web.model.TaskStatisticInfoDTO;
+import pri.zhy.gmc.web.model.*;
 import pri.zhy.gmc.web.service.IGmcTaskService;
-import sun.jvm.hotspot.ui.tree.LongTreeNodeAdapter;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
@@ -35,7 +31,7 @@ public class GmcTaskService implements IGmcTaskService {
     private IGmcTaskMapper taskMapper;
 
     @Override
-    public void addTask(AddTaskRequest addTaskRequest) {
+    public AddTaskResult addTask(AddTaskRequest addTaskRequest) {
         Assert.notBlank(addTaskRequest.getType(), "任务类型不能为空");
         Assert.notBlank(addTaskRequest.getParams(), "任务参数不能为空");
 
@@ -54,6 +50,8 @@ public class GmcTaskService implements IGmcTaskService {
         task.setState(TaskStateEnum.CREATED.getCode());
 
         taskMapper.insert(task);
+
+        return AddTaskResult.builder().rid(task.getRid()).build();
     }
 
     @Override

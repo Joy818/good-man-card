@@ -1,9 +1,6 @@
 package pri.zhy.gmc.web.service;
 
-import pri.zhy.gmc.web.model.AddTaskRequest;
-import pri.zhy.gmc.web.model.QueueInfoDTO;
-import pri.zhy.gmc.web.model.TaskInfoDTO;
-import pri.zhy.gmc.web.model.TaskStatisticInfoDTO;
+import pri.zhy.gmc.web.model.*;
 
 /**
  * TODO
@@ -13,7 +10,7 @@ import pri.zhy.gmc.web.model.TaskStatisticInfoDTO;
  */
 public interface IGmcTaskService {
 
-    void addTask(AddTaskRequest addTaskRequest);
+    AddTaskResult addTask(AddTaskRequest addTaskRequest);
 
     TaskInfoDTO getTaskInfo(String rid);
 

@@ -24,10 +24,9 @@ public class GmcTaskController {
     private IGmcTaskService taskService;
 
     @PostMapping("/add")
-    public R<Void> addTask(@RequestBody AddTaskRequest addTaskRequest) {
+    public R<AddTaskResult> addTask(@RequestBody AddTaskRequest addTaskRequest) {
         log.info("request={}", addTaskRequest);
-        taskService.addTask(addTaskRequest);
-        return R.success();
+        return R.success(taskService.addTask(addTaskRequest));
     }
 
     @GetMapping("/get")
