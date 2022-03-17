@@ -5,7 +5,8 @@ class TaskExecuter:
   def __init__(self, task) -> None:
       self.task = task
       self.success = False
-      self.cuase = None
+      self.cuase = ''
+      self.result = ''
 
   def execute(self):
     params = self.task.get_dict_params()
@@ -18,5 +19,8 @@ class TaskExecuter:
     return self.success
 
 
+  def get_result(self):
+    return self.result
+
   def get_cause(self):
-    return self.cause
+    return self.cuase
